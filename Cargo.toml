@@ -2,5 +2,20 @@
 name = "leetcode"
 version = "0.1.0"
 edition = "2024"
+default-run = "leetcode"
+
+
+[features]
+tokio-sandbox = ["dep:tokio"]
+
+[[bin]]
+name = "leetcode"
+path = "src/main.rs"
+
+[[bin]]
+name = "tokio_sandbox"
+path = "src/tokio_sandbox.rs"
+required-features = ["tokio-sandbox"]
 
 [dependencies]
+tokio = { version = "1", features = ["full"], optional = true}
