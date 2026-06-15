@@ -19,3 +19,4 @@ required-features = ["tokio-sandbox"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"], optional = true}
+rand = "0.10.1"

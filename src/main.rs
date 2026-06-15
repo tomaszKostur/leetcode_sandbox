@@ -1,9 +1,9 @@
 mod add_two_numbers;
-mod two_sum;
-mod palidrome_number;
 mod longest_common_prefix;
-mod valid_sudoku;
+mod palidrome_number;
 mod search_insert_position;
+mod two_sum;
+mod valid_sudoku;
 
 fn main() {
     // two_sum::test2();
@@ -12,11 +12,4 @@ fn main() {
     // longest_common_prefix::test1();
     // valid_sudoku::test1();
     search_insert_position::test1();
-
 }
-
-
-
-
-
-
