@@ -1,16 +1,15 @@
 use rand::{self, RngExt};
+use std::sync::Arc;
 use std::time::Duration;
+use tokio::sync::RwLock;
 use tokio::task;
 use tokio::time;
-use tokio::sync::RwLock;
-use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
     // spawn_example().await;
     random_write_example().await;
 }
-
 
 async fn spawn_example() {
     let join_handler = tokio::task::spawn(random_load(Duration::new(5, 0)));
@@ -34,24 +33,32 @@ async fn random_load(sleep_time: Duration) {
     println!("some_random: {some_random:?}");
 }
 
-
-async fn random_write_example(){
-    let mut shared_vec: Vec<u32> = vec![1,2,3];
+async fn random_write_example() {
+    let mut shared_vec: Vec<u32> = vec![1, 2, 3];
     let sv_lock = Arc::new(RwLock::new(shared_vec));
 
-    let jh1 = tokio::task::spawn(
-        random_write(sv_lock.clone())
-    );
+    let mut join_handlers = Vec::new();
+    for i in 0..5 {
+        let jh1 = tokio::task::spawn(random_write(sv_lock.clone()));
+        join_handlers.push(jh1);
+    }
 
-    jh1.await.unwrap();
+    for i in join_handlers{
+        i.await.unwrap();
+    }
 }
 
 async fn random_write(rwlock: Arc<RwLock<Vec<u32>>>) {
     let task_id = tokio::task::id();
     let mut rng: rand::rngs::SmallRng = rand::make_rng();
     let some_random: u32 = rng.random();
-    // let resource = rwlock.read().await; // WARNING: If you do not put it in a scope then you'll have a deadlock!;
-    let mut w_resource = rwlock.write().await;
-    w_resource.push(6);
-    println!("Resource from task: {task_id}, {w_resource:?}");
+    if some_random % 2 == 0 {
+        // let resource = rwlock.read().await; // WARNING: If you do not put it in a scope then you'll have a deadlock!;
+        println!("write from task: {task_id:?}");
+        let mut w_resource = rwlock.write().await;
+        w_resource.push(some_random);
+    } else {
+        let resource = rwlock.read().await;
+        println!("read from task: {task_id:}, value: {resource:?}");
+    }
 }
